@@ -11,19 +11,19 @@ resource "azurerm_mssql_server" "primary" {
 }
 
 resource "azurerm_mssql_firewall_rule" "vm_primary_internal" {
-  provider            = azurerm.owner  
-  name             = "AllowVmPrimaryInternal"
-  server_id        = azurerm_mssql_server.primary.id
-  
+  provider  = azurerm.owner
+  name      = "AllowVmPrimaryInternal"
+  server_id = azurerm_mssql_server.primary.id
+
   start_ip_address = azurerm_network_interface.vm_primary.private_ip_address
   end_ip_address   = azurerm_network_interface.vm_primary.private_ip_address
 }
 
 resource "azurerm_mssql_firewall_rule" "vm_primary_public" {
-  provider         = azurerm.owner
-  name             = "AllowVmPrimaryPublic"
-  server_id        = azurerm_mssql_server.primary.id
-  
+  provider  = azurerm.owner
+  name      = "AllowVmPrimaryPublic"
+  server_id = azurerm_mssql_server.primary.id
+
   start_ip_address = azurerm_public_ip.vm_primary.ip_address
   end_ip_address   = azurerm_public_ip.vm_primary.ip_address
 }

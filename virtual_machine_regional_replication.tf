@@ -2,9 +2,9 @@ resource "azurerm_recovery_services_vault" "vault" {
   provider            = azurerm.owner
   resource_group_name = azurerm_resource_group.secondary.name
   location            = azurerm_resource_group.secondary.location
-  
-  name                = "example-recovery-vault"  
-  sku                 = "Standard"
+
+  name = "example-recovery-vault"
+  sku  = "Standard"
 }
 
 resource "random_id" "vault_storage_account" {
@@ -19,7 +19,7 @@ resource "azurerm_storage_account" "site_recovery" {
   provider            = azurerm.owner
   resource_group_name = azurerm_resource_group.primary.name
   location            = azurerm_resource_group.primary.location
-  
+
   name                     = "sr${random_id.vault_storage_account.hex}"
   account_tier             = "Standard"
   account_replication_type = "LRS"
@@ -29,7 +29,7 @@ resource "azurerm_site_recovery_fabric" "primary" {
   provider            = azurerm.owner
   resource_group_name = azurerm_resource_group.secondary.name
   location            = azurerm_resource_group.primary.location
-  
+
   name                = "primary-fabric"
   recovery_vault_name = azurerm_recovery_services_vault.vault.name
 }
@@ -37,7 +37,7 @@ resource "azurerm_site_recovery_fabric" "primary" {
 resource "azurerm_site_recovery_protection_container" "primary" {
   provider            = azurerm.owner
   resource_group_name = azurerm_resource_group.secondary.name
-  
+
   name                 = "primary-protection-container"
   recovery_vault_name  = azurerm_recovery_services_vault.vault.name
   recovery_fabric_name = azurerm_site_recovery_fabric.primary.name
@@ -47,7 +47,7 @@ resource "azurerm_site_recovery_fabric" "secondary" {
   provider            = azurerm.owner
   resource_group_name = azurerm_resource_group.secondary.name
   location            = azurerm_resource_group.secondary.location
-  
+
   name                = "secondary-fabric"
   recovery_vault_name = azurerm_recovery_services_vault.vault.name
 }
@@ -55,7 +55,7 @@ resource "azurerm_site_recovery_fabric" "secondary" {
 resource "azurerm_site_recovery_protection_container" "secondary" {
   provider            = azurerm.owner
   resource_group_name = azurerm_resource_group.secondary.name
-  
+
   name                 = "secondary-protection-container"
   recovery_vault_name  = azurerm_recovery_services_vault.vault.name
   recovery_fabric_name = azurerm_site_recovery_fabric.secondary.name
@@ -64,7 +64,7 @@ resource "azurerm_site_recovery_protection_container" "secondary" {
 resource "azurerm_site_recovery_replication_policy" "policy" {
   provider            = azurerm.owner
   resource_group_name = azurerm_resource_group.secondary.name
-  
+
   name                                                 = "policy"
   recovery_vault_name                                  = azurerm_recovery_services_vault.vault.name
   recovery_point_retention_in_minutes                  = 24 * 60
@@ -74,38 +74,38 @@ resource "azurerm_site_recovery_replication_policy" "policy" {
 resource "azurerm_site_recovery_protection_container_mapping" "container-mapping" {
   provider            = azurerm.owner
   resource_group_name = azurerm_resource_group.secondary.name
-  
-  name                                      = "container-mapping"
 
-  recovery_vault_name                       = azurerm_recovery_services_vault.vault.name
-  
-  recovery_fabric_name                      = azurerm_site_recovery_fabric.primary.name  
+  name = "container-mapping"
+
+  recovery_vault_name = azurerm_recovery_services_vault.vault.name
+
+  recovery_fabric_name                      = azurerm_site_recovery_fabric.primary.name
   recovery_source_protection_container_name = azurerm_site_recovery_protection_container.primary.name
-  
-  recovery_target_protection_container_id   = azurerm_site_recovery_protection_container.secondary.id
-  recovery_replication_policy_id            = azurerm_site_recovery_replication_policy.policy.id
+
+  recovery_target_protection_container_id = azurerm_site_recovery_protection_container.secondary.id
+  recovery_replication_policy_id          = azurerm_site_recovery_replication_policy.policy.id
 }
 
 resource "azurerm_site_recovery_network_mapping" "network-mapping" {
   provider            = azurerm.owner
   resource_group_name = azurerm_resource_group.secondary.name
-  
-  name                        = "network-mapping"
 
-  recovery_vault_name         = azurerm_recovery_services_vault.vault.name
-  
+  name = "network-mapping"
+
+  recovery_vault_name = azurerm_recovery_services_vault.vault.name
+
   source_recovery_fabric_name = azurerm_site_recovery_fabric.primary.name
   target_recovery_fabric_name = azurerm_site_recovery_fabric.secondary.name
-  
-  source_network_id           = azurerm_virtual_network.primary.id
-  target_network_id           = azurerm_virtual_network.secondary.id
+
+  source_network_id = azurerm_virtual_network.primary.id
+  target_network_id = azurerm_virtual_network.secondary.id
 }
 
 resource "azurerm_site_recovery_replicated_vm" "vm-replication" {
   provider            = azurerm.owner
   resource_group_name = azurerm_resource_group.secondary.name
-  
-  name                                      = "vm-replication"
+
+  name = "vm-replication"
 
   recovery_vault_name                       = azurerm_recovery_services_vault.vault.name
   source_recovery_fabric_name               = azurerm_site_recovery_fabric.primary.name
@@ -138,10 +138,10 @@ resource "azurerm_site_recovery_replicated_vm" "vm-replication" {
 }
 
 resource "azurerm_site_recovery_replication_recovery_plan" "sample" {
-  provider            = azurerm.owner
-  
-  name                      = "example-recover-plan"
-  
+  provider = azurerm.owner
+
+  name = "example-recover-plan"
+
   recovery_vault_id         = azurerm_recovery_services_vault.vault.id
   source_recovery_fabric_id = azurerm_site_recovery_fabric.primary.id
   target_recovery_fabric_id = azurerm_site_recovery_fabric.secondary.id
